@@ -8,17 +8,22 @@ export class DbManager {
   private db: sqlite3.Database;
   private logs: boolean;
   private path: string;
+  private dbDir: string;
   static entityManagers: { [key: string]: EntityManager<any> } = {};
 
-  constructor(
-    config: { logs: boolean; path: string } = { logs: true, path: "db" }
-  ) {
-    this.logs = config.logs;
-    this.path = path.resolve(config.path, "db.sqlite3");
+  constructor(config?: { logs: boolean; path: string }) {
+    this.logs = config ? (config.logs ? config.logs : false) : false;
+    this.dbDir = path.resolve(
+      config ? (config.path ? config.path : "./db") : "./db"
+    );
+    this.path = path.resolve(this.dbDir, "db.sqlite3");
     if (this.logs) console.log("db path", this.path);
   }
 
   public async initDB() {
+    try {
+      fs.mkdirSync(this.dbDir);
+    } catch {}
     if (!fs.existsSync(this.path)) {
       if (this.logs) console.log("Creating DB");
       fs.writeFileSync(this.path, "");
