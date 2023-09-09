@@ -23,7 +23,9 @@ export class DbManager {
   public async initDB() {
     try {
       fs.mkdirSync(this.dbDir);
-    } catch {}
+    } catch {
+      if (this.logs) console.log("DB dir already exists");
+    }
     if (!fs.existsSync(this.path)) {
       if (this.logs) console.log("Creating DB");
       fs.writeFileSync(this.path, "");
